@@ -1,3 +1,18 @@
+# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import json
 import os
 import subprocess
@@ -21,10 +36,10 @@ opts = [
                default='/var/run/os-collect-config',
                help='Directory in which to store local cache of metadata'),
     cfg.BoolOpt('print_only', dest='print_only',
-               default=False,
+                default=False,
                 help='Query normally, print the resulting configs as a json'
-                     ' map, and exit immediately without running command if it is'
-                     ' configured.'),
+                     ' map, and exit immediately without running command if '
+                     'it is configured.'),
     cfg.StrOpt('server_id',
                help='A string uniquely identifying current instance. Used'
                     'by server to distinguish instances.'),
@@ -54,7 +69,8 @@ class AgentEndpoint(object):
 
 def setup_agent():
     global logger
-    CONF(sys.argv[1:], project='os-collect-config', version=version.version_info.version_string()) 
+    CONF(sys.argv[1:], project='os-collect-config',
+         version=version.version_info.version_string())
     log.setup('os-collect-config')
     logger = log.getLogger(__name__)
 
