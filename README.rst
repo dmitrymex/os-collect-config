@@ -1,59 +1,36 @@
-=================
-os-collect-config
-=================
+===================================
+os-collect-config on oslo.messaging
+===================================
 
--------------------------------------------------
-Collect configuration from cloud metadata sources
--------------------------------------------------
+If you don't know what it is, see the description in the original repo:
+https://github.com/openstack/os-collect-config
 
 What does it do?
 ================
 
-It collects data from defined configuration sources and runs a defined
-hook whenever the metadata has been changed.
+It does the same as the original os-collect-config except it works over
+oslo.messaging instead of metadata service. Naturally it now works in
+RPC manner.
 
 Usage
 =====
 
-You must define what sources to collect configuration data from in
-*/etc/os-collect-config.conf*.
+Comparing with the original os-collect-config there are two changes:
 
-The format of this file is::
+  * You need to use client on the server side to reach out
+    the os-collect-config deployed on an instance
+  * You need to supply proper parameters for oslo.messaging in config
 
-  [default]
-  command=os-refresh-config
+The client is here: os-collect-config/collect_client.py
 
-  [cfn]
-  metadata_url=http://192.0.2.99:8000/v1/
-  access_key_id = ABCDEFGHIJLMNOP01234567890
-  secret_access_key = 01234567890ABCDEFGHIJKLMNOP
-  path = MyResource
-  stack_name = my.stack
+Note that currently requirements.txt list the requirements needed to 
+work with Rabbit MQ. If you want to use different implementation, replace 
+Kombu with the propoper package.
 
-These sources will be polled and whenever any of them is changed,
-*default.command* will be run. A file will be written to the cache
-dir, os_config_files.json, which will be a json list of the file paths
-to the current copy of each metadata source. This list will also be
-set as a colon separated list in the environment variable
-*OS_CONFIG_FILES* for the command that is run. So in the example
-above, *os-refresh-config* would be executed with something like this
-in *OS_CONFIG_FILES*::
+To play with it, install and start Rabbit MQ with the default
+settings and specify a couple additional parameter in both client and
+os-collect-config configs:
+ * rabbit_host - Rabbit MQ IP address
+ * server_id - just an ID which needs to be the same both on client
+   and os-collect-config. Used to distinguish different intances.
 
-  /var/run/os-collect-config/ec2.json:/var/run/os-collect-config/cfn.json
-
-The previous version of the metadata from a source (if available) is present at $FILENAME.last.
-
-When run without a command, the metadata sources are printed as a json document.
-
-Quick Start
-===========
-
-Install::
-
-  sudo pip install -U git+git://git.openstack.org/openstack/os-collect-config.git
-
-Run it on an OpenStack instance with access to ec2 metadata::
-
-  os-collect-config
-
-That should print out a json representation of the entire ec2 metadata tree.
